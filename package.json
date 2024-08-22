@@ -1,0 +1,23 @@
+{
+  "name": "autobus",
+  "version": "0.0.1",
+  "description": "Онлайн расписание автобусов",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "bus"
+  ],
+  "author": "Vladimir [web-master@rootdiv.ru]",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.19.2",
+    "luxon": "^3.5.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
