@@ -18,7 +18,8 @@ const fetchBusData = async () => {
   }
 };
 
-const formatDate = date => date.toISOString().split('T')[0];
+// const formatDate = date => date.toISOString().split('T')[0];
+const formatDate = date => new Intl.DateTimeFormat('ru-RU').format(date);
 const formatTime = date => date.toTimeString().split('T')[0].slice(0, 5);
 
 const renderBusData = buses => {
