@@ -12,6 +12,8 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 const loadBases = async () => {
   const data = await readFile(path.join(__dirname, 'buses.json'), 'utf-8');
   return JSON.parse(data);
@@ -61,7 +63,7 @@ const sendUpdatedData = async () => {
     return {
       ...bus,
       nextDeparture: {
-        date: nextDeparture.toFormat('dd-MM-yyyy'),
+        date: nextDeparture.toFormat('yyyy-MM-dd'),
         time: nextDeparture.toFormat('HH:mm:ss'),
       },
     };
@@ -70,17 +72,18 @@ const sendUpdatedData = async () => {
   return updatedBases;
 };
 
+const sortBuses = buses =>
+  [...buses].sort(
+    (a, b) =>
+      new Date(`${a.nextDeparture.date}T${a.nextDeparture.time}Z`) -
+      new Date(`${b.nextDeparture.date}T${b.nextDeparture.time}Z`),
+  );
+
 app.get('/next-departure', async (req, res) => {
   try {
     const updatedBases = await sendUpdatedData();
-    updatedBases.sort((a, b) => {
-      if (a.nextDeparture.date === b.nextDeparture.date) {
-        return a.nextDeparture.time.localeCompare(b.nextDeparture.time);
-      } else {
-        return a.nextDeparture.date.localeCompare(b.nextDeparture.date);
-      }
-    });
-    res.json(updatedBases);
+    const sortedBuses = sortBuses(updatedBases);
+    res.json(sortedBuses);
   } catch (error) {
     console.error(error);
     res.status(500).send('На сервере произошла ошибка, попробуйте оправить запрос позже');
