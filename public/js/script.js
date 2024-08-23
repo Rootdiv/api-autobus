@@ -1,3 +1,10 @@
+const currentTime = () => {
+  const time = document.getElementById('time');
+
+  const timeNow = new Date();
+  time.textContent = timeNow.toLocaleString('ru-RU').replace(',', '');
+};
+
 const fetchBusData = async () => {
   try {
     const response = await fetch('/next-departure');
@@ -37,6 +44,9 @@ const renderBusData = buses => {
 };
 
 const init = async () => {
+  currentTime();
+  setInterval(currentTime, 1000);
+
   const buses = await fetchBusData();
   renderBusData(buses);
 };
