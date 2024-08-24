@@ -44,12 +44,34 @@ const renderBusData = buses => {
   });
 };
 
+const initWebSocket = () => {
+  const ws = new WebSocket(`ws://${location.host}`);
+  ws.addEventListener('open', () => {
+    console.log('WebSocket connection');
+  });
+
+  ws.addEventListener('message', event => {
+    const buses = JSON.parse(event.data);
+    renderBusData(buses);
+  });
+
+  ws.addEventListener('error', error => {
+    console.error(`WebSocket error: ${error}`);
+  });
+
+  ws.addEventListener('close', () => {
+    console.log('Server WebSocket connection close');
+  });
+};
+
 const init = async () => {
   currentTime();
   setInterval(currentTime, 1000);
 
   const buses = await fetchBusData();
   renderBusData(buses);
+
+  initWebSocket();
 };
 
 init();

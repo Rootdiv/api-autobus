@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
 import { DateTime } from 'luxon';
+import { WebSocketServer } from 'ws';
 
 const PORT = process.env.PORT || 2224;
 const timeZone = 'UTC';
@@ -90,6 +91,38 @@ app.get('/next-departure', async (req, res) => {
   }
 });
 
-app.listen(PORT, 'localhost', () => {
+const wss = new WebSocketServer({ noServer: true });
+const clients = new Set();
+
+wss.on('connection', ws => {
+  console.log('Client WebSocket connection');
+  clients.add(ws);
+
+  const setUpdates = async () => {
+    try {
+      const updatedBases = await sendUpdatedData();
+      const sortedBuses = sortBuses(updatedBases);
+      ws.send(JSON.stringify(sortedBuses));
+    } catch (error) {
+      console.error(`Error WebSocket connection: ${error}`);
+    }
+  };
+
+  const intervalId = setInterval(setUpdates, 1000);
+
+  ws.on('close', () => {
+    clearInterval(intervalId);
+    clients.delete(ws);
+    console.log('Client WebSocket closed');
+  });
+});
+
+const server = app.listen(PORT, 'localhost', () => {
   console.log(`Сервер запущен на http://localhost:${PORT}`);
+});
+
+server.on('upgrade', (req, socket, head) => {
+  wss.handleUpgrade(req, socket, head, ws => {
+    wss.emit('connection', ws, req);
+  });
 });
