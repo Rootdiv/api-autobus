@@ -9,9 +9,16 @@
   </head>
   <body>
     <div class="container">
-      <div class="d-flex align-items-center justify-content-evenly my-3">
+      <div class="d-flex align-items-center justify-content-between gap-2 my-3">
         <h1 class="m-0">Ближайшие отправления автобусов</h1>
-        <div id="time" class="me-2 fs-3">00:00:00</div>
+        <div
+          class="alert alert-primary m-0 p-2 d-flex align-items-center justify-content-between gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor">
+            <path
+              d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71z" />
+          </svg>
+          <span id="time" class="fw-bold">00:00:00</span>
+        </div>
       </div>
       <table id="bus" class="table table-striped table-bordered">
         <thead>

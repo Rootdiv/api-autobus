@@ -3,6 +3,8 @@ const currentTime = () => {
 
   const timeNow = new Date();
   time.textContent = timeNow.toLocaleString('ru-RU').replace(',', '');
+
+  setTimeout(currentTime, 1000);
 };
 
 const fetchBusData = async () => {
@@ -67,7 +69,6 @@ const initWebSocket = () => {
 
 const init = async () => {
   currentTime();
-  setInterval(currentTime, 1000);
 
   const buses = await fetchBusData();
   renderBusData(buses);
