@@ -26,25 +26,13 @@ const getNextDeparture = (firstDepartureTime, frequencyMinutes) => {
 
   let departure = DateTime.now().set({ hour, minute, second: 0 }).setZone(timeZone);
 
-  if (now > departure) {
-    departure = departure.plus({ minutes: frequencyMinutes });
-  }
-
   const endOfDay = DateTime.now().set({ hour: 23, minute: 59 }).setZone(timeZone);
-
-  if (now > endOfDay) {
-    departure = departure.startOf('day').plus({ days: 1 }).set({ hour, minute }).setZone(timeZone);
-  }
 
   while (now > departure) {
     departure = departure.plus({ minutes: frequencyMinutes });
 
     if (now > endOfDay) {
-      departure = departure
-        .startOf('day')
-        .plus({ days: 1 })
-        .set({ hour, minute })
-        .setZone(timeZone);
+      departure = DateTime.now().set({ hour, minute }).plus({ days: 1 }).setZone(timeZone);
     }
   }
 
