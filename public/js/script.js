@@ -24,6 +24,12 @@ const fetchBusData = async () => {
 const formatDate = date => new Intl.DateTimeFormat('ru-RU').format(date);
 const formatTime = date => date.toTimeString().split('T')[0].slice(0, 5);
 
+const getRemainingSeconds = departureTime => {
+  const now = new Date();
+  const timeDeference = departureTime - now;
+  return Math.floor(timeDeference / 1000);
+};
+
 const renderBusData = buses => {
   const tableBody = document.querySelector('#bus tbody');
   tableBody.textContent = '';
@@ -35,13 +41,17 @@ const renderBusData = buses => {
       `${bus.nextDeparture.date}T${bus.nextDeparture.time}Z`,
     );
 
+    const remainingSeconds = getRemainingSeconds(nextDepartureDateTimeUTC);
+
+    const remainingTimeText = remainingSeconds < 60 ? 'Отправляется' : bus.nextDeparture.remaining;
+
     row.insertAdjacentHTML(
       'afterbegin',
       `<td>${bus.busNumber}</td>
       <td>${bus.startPoint} - ${bus.endPoint}</td>
       <td>${formatDate(nextDepartureDateTimeUTC)}</td>
       <td>${formatTime(nextDepartureDateTimeUTC)}</td>
-      <td>${bus.nextDeparture.remaining}</td>`,
+      <td>${remainingTimeText}</td>`,
     );
     tableBody.append(row);
   });
