@@ -2,7 +2,7 @@ import express from 'express';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import url from 'node:url';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import { WebSocketServer } from 'ws';
 
 const PORT = process.env.PORT || 2224;
@@ -22,22 +22,18 @@ const loadBases = async () => {
 
 const getNextDeparture = (firstDepartureTime, frequencyMinutes) => {
   const now = DateTime.now().setZone(timeZone);
-  const [hours, minutes] = firstDepartureTime.split(':').map(Number);
+  const [hour, minute] = firstDepartureTime.split(':').map(Number);
 
-  let departure = DateTime.now().set({ hours, minutes }).setZone(timeZone);
+  let departure = DateTime.now().set({ hour, minute, second: 0 }).setZone(timeZone);
 
   if (now > departure) {
     departure = departure.plus({ minutes: frequencyMinutes });
   }
 
-  const endOfDay = DateTime.now().set({ hours: 23, minutes: 59 }).setZone(timeZone);
+  const endOfDay = DateTime.now().set({ hour: 23, minute: 59 }).setZone(timeZone);
 
   if (now > endOfDay) {
-    departure = departure
-      .startOf('day')
-      .plus({ days: 1 })
-      .set({ hours, minutes })
-      .setZone(timeZone);
+    departure = departure.startOf('day').plus({ days: 1 }).set({ hour, minute }).setZone(timeZone);
   }
 
   while (now > departure) {
@@ -47,7 +43,7 @@ const getNextDeparture = (firstDepartureTime, frequencyMinutes) => {
       departure = departure
         .startOf('day')
         .plus({ days: 1 })
-        .set({ hours, minutes })
+        .set({ hour, minute })
         .setZone(timeZone);
     }
   }
@@ -57,15 +53,19 @@ const getNextDeparture = (firstDepartureTime, frequencyMinutes) => {
 
 const sendUpdatedData = async () => {
   const buses = await loadBases();
+  const now = DateTime.now().setZone(timeZone);
 
   const updatedBases = buses.map(bus => {
     const nextDeparture = getNextDeparture(bus.firstDepartureTime, bus.frequencyMinutes);
+
+    const timeRemaining = Duration.fromMillis(nextDeparture.diff(now).toMillis());
 
     return {
       ...bus,
       nextDeparture: {
         date: nextDeparture.toFormat('yyyy-MM-dd'),
         time: nextDeparture.toFormat('HH:mm:ss'),
+        remaining: timeRemaining.toFormat('hh:mm:ss'),
       },
     };
   });
