@@ -58,7 +58,9 @@ const renderBusData = buses => {
 };
 
 const initWebSocket = () => {
-  const ws = new WebSocket(`ws://${location.host}`);
+  const protocol = location.protocol === 'http:' ? 'ws' : 'wss';
+  const ws = new WebSocket(`${protocol}://${location.host}`);
+
   ws.addEventListener('open', () => {
     console.log('WebSocket connection');
   });

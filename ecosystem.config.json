@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "autobus",
+      "script": "index.js",
+      "watch": [
+        "public",
+        "index.js"
+      ],
+      "env": {
+        "PROD": true
+      }
+    }
+  ]
+}
